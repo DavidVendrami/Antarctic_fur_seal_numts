@@ -29,8 +29,6 @@ numt<-split(data,f=data$Query)
 
 
 # numts phylogenetic trees. Get mtDNA of the other pinniped species (+ the dog) and build phylogenies separately for each relevant numt.
-
-
 ## Now let's try to blast each AFS numt to each mt ref genome
 ## First you need to self-concatenate the ref mt genomes (so that you dont miss alignments in case they go over the end - mt genome is circular)
 for i in *.fasta; do cat $i $i > ../${i%.fasta}_selfConc.fasta; done
@@ -39,8 +37,8 @@ for i in *.fasta; do cat $i $i > ../${i%.fasta}_selfConc.fasta; done
 for i in *.fasta; do makeblastdb -in $i -parse_seqids -dbtype nucl; done &
 ## Now extract the first numt (where numts.fasta is a fasta file containing the AFS numt squences):
 sed -n '1,2p' numts/numts.fasta > numt_1.fasta
-## Let's try to blast  it to some species:
-for i in *.fasta; do blastn -db $i -query ./numts/numt_25.fasta -outfmt 7 -word_size 20 -out ${i%.fasta}_numt25_blast; done
+## Let's try to blast  it to some species (needs to be repeated for each numt, for numt with multiple fragments see next code block):
+for i in *.fasta; do blastn -db $i -query ./numts/numt_1.fasta -outfmt 7 -word_size 20 -out ${i%.fasta}_numt1_blast; done
 ## Let's create a bunch of bed files to extract the blasted sequences (*_numt1_blast.txt)
 for i in *_blast; do sed -n '6p' $i | cut -d$'\t' -f2,10 > $i.txt; done
 for i in *_blast; do sed -n '6p' $i | cut -d$'\t' -f9 > $i.sec; done
